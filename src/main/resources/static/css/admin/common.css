@@ -1,0 +1,21 @@
+.page-link.active {
+    background-color: blue;
+    color: white;
+}
+
+.hover-primary:hover {background-color: #007bff !important;color: white !important;}
+.hover-primary:hover > * {color: white !important;}
+
+.cursor-pointer {cursor: pointer;}
+
+.plain-text {
+    white-space: pre;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.ui-autocomplete { position: absolute; cursor: default;z-index:2000 !important;background-color: whitesmoke}
+
+.nav-item.active {background-color: lightgray;}

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" th:xmllang="${#locale.language}">
+<head th:replace="~{admin/mock-server/common :: head(~{this::meta}, ~{this::link}, ~{this::script})}">
+    <meta name="url-id" th:content="${urlId}">
+    <title></title>
+
+    <link type="text/css" rel="stylesheet" th:href="@{/static/plugins/highlight-js/styles/atom-one-light.min.css}"/>
+
+    <link type="text/css" rel="stylesheet" th:href="@{/static/css/admin/mock-server/url-detail.css}"/>
+
+    <!-- highlight js-->
+    <script th:src="@{/static/plugins/highlight-js/highlight.min.js}"></script>
+    <script th:src="@{/static/plugins/highlight-js/languages/json.min.js}"></script>
+    <script th:src="@{/static/plugins/highlight-js/languages/javascript.min.js}"></script>
+
+    <!-- ace editor -->
+    <script th:src="@{/static/plugins/ace-editor/ace.min.js}"></script>
+    <script th:src="@{/static/plugins/ace-editor/ext-beautify.js}"></script>
+
+    <script th:src="@{/static/js/common/jquery-ace-editor.js}"></script>
+
+    <script th:src="@{/static/js/admin/mock-server/url-detail.js}"></script>
+    <script th:src="@{/static/js/admin/mock-server/url-response.js}"></script>
+</head>
+
+<body th:replace="~{admin/mock-server/common :: body(~{this::div})}">
+<!-- Content Wrapper. Contains page content -->
+<div class='content-wrapper' th:data-id="${urlId}">
+    <!-- Content Header (Page header) -->
+    <section class='content-header'>
+        <div class='container-fluid'>
+            <div class='row mb-2'>
+                <div class='col-sm-6'>
+                    <h1>Mock URL Detail</h1>
+                </div>
+                <div class='col-sm-6'>
+                    <ol class='breadcrumb float-sm-right'>
+                        <li class='breadcrumb-item text-info'>Detail ID</li>
+                        <li class='breadcrumb-item active' id='li-url-detail-id' data-group='url' data-name='id' data-target='text'></li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <section class='content'>
+        <div class='container-fluid'>
+            <div class='row'>
+                <div class='col-12'>
+                    <div class='card callout callout-info'>
+                        <div class='row'>
+                            <div class='col-11'>
+                                <h3 class='text-black' id='txt-url-uri' data-group='url' data-name='uri' data-target='text'></h3>
+                            </div>
+                            <div class='col-md-1 col-sm-12 btn-group'>
+                                <label for='toggle-url-enable'></label>
+                                <input id='toggle-url-enable' type='checkbox' checked='checked' data-toggle='toggle' data-size='mini' data-group='url' data-name='enabled' data-target='value'>
+                            </div>
+                        </div>
+                        <div class='row'>
+                            <div class='col'>
+                                <h5 class='mb-0 pb-0' data-group='url' data-name='name' data-target='text'></h5>
+                                <p class='text-gray text-sm pl-2 mt-0 pt-0' data-group='url' data-name='description' data-target='text'></p>
+                            </div>
+                            <div class='col-lg-1 col-md-2 col-sm-12 mr-2 pr-2 btn-group text-sm'>
+                                <button type='button' class='btn btn-danger btn-sm' id='btn-url-delete'><i class='fas fa-trash'></i></button>
+                                <button type='button' class='btn btn-secondary btn-sm' id='btn-url-edit' data-toggle="modal" data-target="#modal-url-edit"><i class='fas fa-edit'></i></button>
+                                <button type='button' class='btn btn-info btn-sm' id='btn-url-test'><i class='fas fa-play'></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main content -->
+                    <div class='invoice p-3 mb-3 min-vh-100'>
+                        <!-- title row -->
+                        <div class='row'>
+                            <div id='div-url-response-list' class='col' data-default-class='col' data-depends-class='col-lg-5'>
+                                <div class='card'>
+                                    <div class='card-header btn' data-card-widget='collapse' title='Collapse'>
+                                        <h3 class='card-title'>Responses</h3>
+                                        <div class='card-tools'>
+                                            <button type='button' class='btn btn-tool'>
+                                                <i class='fas fa-sort-down'></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- /.card-header -->
+                                    <div class='card-body table-responsive p-0'>
+                                        <table class='table table-hover table-sm text-nowrap'>
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Response Status</th>
+                                                <th>Request Method</th>
+                                                <th>Condition</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id='tbl-response-list'>
+                                            <tr class='text-center'><td colspan='4'>No Content</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!-- /.card-body -->
+                                    <div class='card-footer clearfix'>
+                                        <form id='form-response-list' th:action="@{/api/v1/mock-responses}">
+                                            <input type='hidden' name='size' value='15'>
+                                            <input type='hidden' id='input-response-search-page' name='page' value='0'>
+                                            <input type='hidden' name='mockUrlId'>
+                                            <ul class='pagination pagination-sm m-0 float-left'>
+                                                <li class='page-item'><button id='btn-response-list-previous' class='btn btn-primary page-link'>«</button></li>
+                                                <li class='page-item'><button id='btn-response-list-next'  class='btn btn-primary page-link'>»</button></li>
+                                            </ul>
+                                        </form>
+                                        <div class='float-right'>
+                                            <button type='button' class='btn btn-primary btn-sm' id='btn-response-add'><i class='fas fa-plus'></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.col -->
+                            <div id='div-url-response-detail' class='col-lg-6 col-md-12 col-sm-12' style='display: none;'>
+                                <input type='hidden' name='mockUrlId' data-group='response' data-name='mockUrlId' data-target='value'>
+                                <input type='hidden' id='input-response-id' name='id' data-group='response' data-name='id' data-target='value'>
+                                <div class='card card-info card-outline card-tabs'>
+                                    <div class='card-header p-0 pt-1 border-bottom-0'>
+                                        <div class='row'>
+                                            <div class='col'>
+                                                <ul class='nav nav-tabs' id='custom-tabs-three-tab' role='tablist'>
+                                                    <li class='nav-item'>
+                                                        <a class='nav-link response-detail-tab active' id='tabs-response-detail' data-toggle='pill' href='#tabs-response-detail-content' role='tab' aria-controls='tabs-response-detail-content' aria-selected='true'>Detail</a>
+                                                    </li>
+                                                    <li class='nav-item'>
+                                                        <a class='nav-link response-detail-tab' id='tabs-response-when' data-toggle='pill' href='#tabs-response-when-content' role='tab' aria-controls='tabs-response-when-content' aria-selected='false'>When</a>
+                                                    </li>
+                                                    <li class='nav-item'>
+                                                        <a class='nav-link response-detail-tab' id='tabs-response-body' data-toggle='pill' href='#tabs-response-body-content' role='tab' aria-controls='tabs-response-body-content' aria-selected='false'>Response Body</a>
+                                                    </li>
+                                                    <li class='nav-item'>
+                                                        <a class='nav-link response-detail-tab' id='tabs-response-header' data-toggle='pill' href='#tabs-response-header-content' role='tab' aria-controls='tabs-response-header-content' aria-selected='false'>Response Header</a>
+                                                    </li>
+                                                    <li class='nav-item ml-auto'>
+                                                        <input type='hidden' name='id' data-group='response' data-name='id' data-target='value'>
+                                                        <button type='button' class='btn btn-danger btn-sm mr-2 pr-2' data-form-toggle='edit' id='btn-response-delete'><i class='fas fa-trash'></i></button>
+                                                        <button type='button' class='btn btn-secondary btn-sm' data-form-toggle='view' id='btn-response-edit'><i class='fas fa-edit'></i></button>
+                                                        <button type='button' class='btn btn-sm mr-2 pr-2' id='btn-response-hide' data-form-toggle='view' title='Remove'><i class='fas fa-times'></i></button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='card-body'>
+                                        <div class='tab-content' id='custom-tabs-three-tabContent'>
+                                            <div class='tab-pane fade active show' id='tabs-response-detail-content' role='tabpanel' aria-labelledby='tabs-response-detail'>
+                                                <form id='form-response-detail' class='partial-form' data-id-field='#input-response-id'>
+                                                    <input type="hidden" name="enabled" value="true"/>
+                                                    <input type="hidden" name="mockUrlId" data-group='url' data-name='id' data-target='value'/>
+
+                                                    <div class='form-group row' data-form-toggle='view'>
+                                                        <label class='col-md-2 col-sm-3 col-form-label'>ID</label>
+                                                        <span class='col' data-group='response' data-name='id' data-target='text'></span>
+                                                    </div>
+                                                    <div class='form-group row'>
+                                                        <label for='input-response-no' class='col-md-2 col-sm-3 col-form-label'>Order</label>
+                                                        <div data-form-toggle='view' class='col'>
+                                                            <span data-group='response' data-name='no' data-target='text' class='text-black form-control-plaintext'></span>
+                                                        </div>
+                                                        <div data-form-toggle='edit' class='col' style='display: none;'>
+                                                            <input id='input-response-no' name='no' type='number' class='form-control' data-group='response' data-name='no' data-target='value'>
+                                                        </div>
+                                                        <div data-form-toggle='edit' class='col-md-3 col-sm-3 btn-group-sm' style='display: none;'>
+                                                            <button class='btn btn-sm btn-default' name='btn-response-order-pre-value' data-value='first'>First</button>
+                                                            <button class='btn btn-sm btn-default' name='btn-response-order-pre-value' data-value='last'>Last</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class='form-group row'>
+                                                        <label for='input-response-status' class='col-md-4 col-sm-6 col-form-label'>Response Status</label>
+                                                        <div data-form-toggle='view' class='col flex-column'>
+                                                            <span class='btn btn-info w-auto form-control-plaintext' data-color-group='status' data-current-color='btn-info' data-group='response' data-name='status' data-target='text'>200</span>
+                                                        </div>
+                                                        <div data-form-toggle='edit' class='col' style='display: none;'>
+                                                            <select id='input-response-status' name='status' class='custom-select' data-group='response' data-name='status' data-target='value' th:insert="admin/mock-server/common::http-status-options"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class='form-group' data-form-toggle='view'>
+                                                        <p class='text text-gray plain-text form-control-plaintext' data-group='response' data-name='description' data-target='text'></p>
+                                                    </div>
+                                                    <div class='form-group' data-form-toggle='edit' style='display: none;'>
+                                                        <label for='input-response-description'>Description</label>
+                                                        <textarea id='input-response-description' class='form-control' name='description' data-group='response' data-name='description' data-target='value'></textarea>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class='tab-pane fade' id='tabs-response-when-content' role='tabpanel' aria-labelledby='tabs-response-when'>
+                                                <form id='form-response-when' class='partial-form' data-id-field='#input-response-id'>
+                                                    <div class='form-group row'>
+                                                        <label for='input-response-method' class='col-md-4 col-sm-6 col-form-label'>Request Method</label>
+                                                        <div data-form-toggle='view' class='col'>
+                                                            <span class='btn btn-primary w-auto form-control-plaintext' data-color-group='method' data-current-color='btn-primary' data-group='response' data-name='method' data-target='text'>GET</span>
+                                                        </div>
+                                                        <div data-form-toggle='edit' class='col' style='display: none;'>
+                                                            <select id='input-response-method' name='method' class='custom-select' data-group='response' data-name='method' data-target='value'>
+                                                                <option value='POST'>POST</option>
+                                                                <option value='PUT'>PUT</option>
+                                                                <option value='GET'>GET</option>
+                                                                <option value='PATCH'>PATCH</option>
+                                                                <option value='DELETE'>DELETE</option>
+                                                                <option value='HEAD'>HEAD</option>
+                                                                <option value='OPTIONS'>OPTIONS</option>
+                                                                <option value='TRACE'>TRACE</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class='form-group row'>
+                                                        <label for='input-response-condition' class='col col-form-label'>Condition <a target='_blank' href='https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html'>(SpEL)</a></label>
+                                                    </div>
+                                                    <div class='form-group row' data-form-toggle='view'>
+                                                        <!--                                                            <div class='col code-view' data-init-class='' data-group='response' data-name='condition' data-target='code'>-->
+                                                        <div class='col code-view' data-language='javascript' data-group='response' data-name='condition' data-target='code'></div>
+                                                    </div>
+                                                    <div class='form-group row' data-form-toggle='edit' style='display: none;'>
+                                                        <textarea id='input-response-condition' name='condition' class='form-control' rows='3' data-group='response' data-name='condition' data-target='value'></textarea>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class='tab-pane fade' id='tabs-response-body-content' role='tabpanel' aria-labelledby='tabs-response-body'>
+                                                <form id='form-response-body' class='partial-form' data-id-field='#input-response-id' th:action="@{/api/v1/mock-responses}">
+                                                    <div data-form-toggle='view' class='form-group' data-language='json' data-group='response' data-name='body' data-target='code'></div>
+                                                    <div data-form-toggle='edit' class='form-group row flex-fill h-100' style='display: none;'>
+                                                        <div class='col d-flex flex-column'>
+                                                            <label class='hidden' for='input-response-body'></label>
+                                                            <textarea class='hidden' name='body' id='input-response-body'></textarea>
+                                                            <div data-code-editor="ace" data-group='response' data-name='body' data-target='editor' data-editor-value-for='input-response-body' data-editor-lang='json' data-editor-theme='chrome'></div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class='tab-pane fade' id='tabs-response-header-content' role='tabpanel' aria-labelledby='tabs-response-header'>
+                                                <form id='form-response-header'></form>
+                                                <button class='btn btn-outline-primary btn-sm float-right mb-2 mt-0 pt-0' data-form-toggle='edit' id='btn-response-new-header'>Add</button>
+                                                <table class='table table-sm table-bordered text-wrap text-break'>
+                                                    <thead>
+                                                    <tr>
+                                                        <th class='w-25'>Name</th>
+                                                        <th colspan='2'>Values</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id='tbl-response-detail-headers'>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='card-footer' data-form-toggle='edit' style='display: none;'>
+                                        <button type='submit' class='btn btn-default' id='btn-response-edit-cancel'>Cancel</button>
+                                        <button type='submit' class='btn btn-info float-right' id='btn-response-edit-save'>Save</button>
+                                    </div>
+                                    <!-- /.card -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.invoice -->
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+</body>
+<div class='modal fade' id='modal-url-edit'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <h4 class='modal-title'>Edit URL</h4>
+                <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                    <span aria-hidden='true'>&times;</span>
+                </button>
+            </div>
+            <div class='modal-body'>
+                <form id='form-url-edit' data-id-field='#input-url-edit-id' th:action="@{/api/v1/mock-urls}">
+                    <input type='hidden' id='input-url-edit-id' name='id' data-group='url' data-name='id' data-target='value' value=''>
+                    <input type='hidden' name='enabled' value='true'>
+                    <div class='form-group'>
+                        <label for='input-url-edit-name'>Name</label>
+                        <input type='text' name='name' class='form-control' data-group='url' data-name='name' data-target='value' id='input-url-edit-name' placeholder='Enter Name'>
+                    </div>
+                    <div class='form-group'>
+                        <label for='input-url-edit-uri'>URI</label>
+                        <input type='text' name='uri' class='form-control' data-group='url' data-name='uri' data-target='value' id='input-url-edit-uri' placeholder='Enter URI'>
+                    </div>
+                    <div class='form-group'>
+                        <label for='input-url-edit-description'>Description</label>
+                        <textarea name='description' id='input-url-edit-description' data-group='url' data-name='description' data-target='value' class='form-control' rows='3' placeholder='Enter Description for this url ...'></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class='modal-footer justify-content-between'>
+                <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>
+                <button type='submit' class='btn btn-info' form='form-url-edit' id='btn-url-edit-submit'>Save</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<th:block th:insert="~{admin/mock-server/url-test :: url-test-modal}"></th:block>
+</html>

@@ -1,0 +1,13 @@
+h3.cancel {
+    text-decoration-line: line-through;
+    text-decoration-style: solid;
+    color: darkgrey !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ":";
+}
+
+.code-view {
+    padding: 10px 10px 10px 10px;
+}

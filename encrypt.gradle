@@ -1,0 +1,78 @@
+import org.jasypt.encryption.StringEncryptor
+
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+
+buildscript {
+    repositories {
+        gradlePluginPortal()
+
+        mavenCentral()
+
+        Map<String, String> ENV_MAP = new HashMap<>();
+        Properties env = new Properties();
+        env.load(new File("${project.rootDir}/.env").newInputStream());
+        ENV_MAP.putAll(System.getenv())
+        env.entrySet().stream().forEach(entry -> ENV_MAP.put(entry.getKey(), entry.getValue()))
+
+        maven {
+            url ENV_MAP.getOrDefault("PRIVATE_REPO_URL", "")
+            allowInsecureProtocol = true
+            credentials {
+                username = ENV_MAP.getOrDefault("PRIVATE_REPO_CRED_USR", "NO_USER")
+                password = ENV_MAP.getOrDefault("PRIVATE_REPO_CRED_PSW", "NO_PASS")
+            }
+        }
+    }
+
+    dependencies {
+        classpath group: 'commons-codec', name: 'commons-codec', version: '1.2'
+//        classpath group: 'commons-codec', name: 'commons-codec', version: '1.2'
+        classpath group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.5'
+//
+        classpath group: 'dev.kirin.common', name: 'core', version: '1.0.0-SNAPSHOT'
+        classpath group: 'dev.kirin.common', name: 'common-spring', version: '1.0.0-SNAPSHOT'
+//        classpath files('/Users/soulkst/workspace/development/commons/common-spring/build/libs/common-spring-1.0.0-SNAPSHOT.jar')
+
+    }
+}
+
+plugins {
+    id 'java'
+    id 'idea'
+    id 'org.springframework.boot' version '2.7.8'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+
+defaultTasks 'encrypt'
+
+tasks.register("encrypt") {
+    String keyFile = System.getProperty("key-file")
+    String value = System.getProperty("value")
+
+    doFirst {
+        if(StringUtil.isEmpty(keyFile)) {
+            throw new FileNotFoundException("Not found property 'key-file'")
+        }
+
+        if(StringUtil.isEmpty(value)) {
+            throw new IllegalArgumentException("Not found property 'value'")
+        }
+    }
+    doLast {
+        EncryptorProperties properties = new EncryptorProperties()
+        EncryptorConfig config = new EncryptorConfig()
+
+        Field field = properties.getClass().getDeclaredField("keyFile");
+        field.setAccessible(true)
+        field.set(properties, keyFile);
+        Method method = config.getClass().getDeclaredMethod("stringEncryptor", EncryptorProperties.class);
+        method.setAccessible(true);
+
+        StringEncryptor encryptor = (StringEncryptor) method.invoke(config, properties);
+        String encrypted = encryptor.encrypt(value);
+
+        println("Encrypted text : " + encrypted)
+    }
+}

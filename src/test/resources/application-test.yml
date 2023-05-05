@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:api_mock
+    username: sa
+    password:
+  jpa:
+    generate-ddl: true
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  security:
+    user:
+      name: test
+      password: password
+    extension:
+      csrf:
+        header-name: X-CSRF-TOKEN
+        parameter-name: _csrf
+
+logging:
+  level:
+    root: info
+    dev.kirin: debug
+    web: debug

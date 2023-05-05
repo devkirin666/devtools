@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" th:xmllang="${#locale.language}">
+
+<head th:fragment="head(metas, links, scripts)">
+    <th:block th:replace="~{admin/common :: base-meta}" />
+    <meta name="base-page" th:content="@{/view/admin/mock-server}">
+    <th:block th:if="${metas} != null">
+        <th:block th:replace="${metas}" />
+    </th:block>
+    <title>Mock-URL Management</title>
+
+    <th:block th:replace="~{admin/common :: base-styles}" />
+    <link type="text/css" rel="stylesheet" th:href="@{/static/css/admin/mock-server/common.css}"/>
+
+    <th:block th:if="${links} != null">
+        <th:block th:replace="${links}" />
+    </th:block>
+
+    <th:block th:replace="~{admin/common :: base-scripts}" />
+    <script th:src="@{/static/js/admin/mock-server/common.js}"></script>
+    <script th:src="@{/static/js/admin/mock-server/sidebar.js}"></script>
+
+    <th:block th:if="${scripts} != null">
+        <th:block th:replace="${scripts}" />
+    </th:block>
+</head>
+
+<body class='hold-transition sidebar-mini layout-fixed layout-footer-fixed' th:fragment="body(pageContent)">
+<div class='wrapper'>
+    <th:block th:replace="admin/common :: navbar-menu">
+    </th:block>
+
+    <!-- Main Sidebar Container -->
+    <aside class='main-sidebar elevation-4 sidebar-light-secondary'>
+        <!-- Brand Logo -->
+        <a th:href="@{${mockServer_baseUrl}}" class='brand-link'>
+            <span class='brand-text font-weight-light'>MockServer Management</span>
+        </a>
+
+        <!-- Sidebar -->
+        <div class='sidebar'>
+            <!-- SidebarSearch Form -->
+            <form class='form-inline' id='form-url-search'>
+                <div class='input-group' data-widget='sidebar-search'>
+                    <input class='form-control form-control-sidebar' name="keyword" type='search' placeholder='Search' aria-label='Search'>
+                    <input type='hidden' name='page' value='0'>
+                    <input type='hidden' name='size' value='10'>
+                    <input type='hidden' name='sort' value='name,asc'>
+                    <div class='input-group-append'>
+                        <button class='btn btn-sidebar'>
+                            <i class='fas fa-search fa-fw'></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Sidebar Menu -->
+            <nav class='mt-2 text-sm'>
+                <ul class='nav nav-pills nav-sidebar flex-column nav-compact' data-widget='treeview' role='menu' data-accordion='false'>
+                    <!-- Add icons to the links using the .nav-icon class
+                         with font-awesome or any other icon font library -->
+                    <li class='nav-item'>
+                        <a th:href="@{${mockServer_baseUrl}}" class='nav-link'>
+                            <i class='nav-icon fas fa-home'></i>
+                            <p>Main</p>
+                        </a>
+                    </li>
+<!--                    <li class='nav-item'>-->
+<!--                        <a th:href="@{${mockServer_baseUrl + '/user-manual'}}" class='nav-link'>-->
+<!--                            <i class="nav-icon fas fa-file-signature"></i>-->
+<!--                            <p>User Manual</p>-->
+<!--                        </a>-->
+<!--                    </li>-->
+                </ul>
+                <ul id='nav-url' class='nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact' data-widget='treeview' role='menu' data-accordion='false'>
+                    <li class='nav-header'>Errors</li>
+                    <th:block th:each="errorType : ${mockServer_errorTypes}">
+                        <li class="nav-item">
+                            <a th:href="@{${mockServer_baseUrl + '/errors/' + errorType.name()}}" class="nav-link">
+                                <i class="fas fa-circle nav-icon text-warning"></i>
+                                <p th:text="${errorType.getTitle()}"></p>
+                            </a>
+                        </li>
+                    </th:block>
+                    <li class='nav-header nav-urls'>
+                        Mock URLs
+                        <span class='text-center ml-3 pl-3'>
+                            <label for="toggle-url-list"></label>
+                            <input id="toggle-url-list" type='checkbox' checked='checked' data-toggle='toggle' data-size='mini' data-on='Name' data-off='URI' data-onstyle="info" data-offstyle="default">
+                        </span>
+                        <span class="float-right text-center border border-primary hover-primary cursor-pointer" data-toggle="modal" data-target="#modal-new-url">
+                            <span class="text-primary p-1 m-1" id="a-new-url"><i class="fas fa-plus fa-xs"></i></span>
+                        </span>
+                    </li>
+                </ul>
+            </nav>
+            <!-- /.sidebar-menu -->
+        </div>
+        <!-- /.sidebar -->
+    </aside>
+    <div class="modal fade" id="modal-new-url">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">New URL</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-new-url" th:action="@{/api/v1/mock-urls}">
+                        <input type="hidden" name="enabled" value="true">
+                        <div class="form-group">
+                            <label for="input-new-url-name">Name</label>
+                            <input type="text" name="name" class="form-control" id="input-new-url-name" required placeholder="Enter Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-new-url-uri">URI</label>
+                            <input type="text" name="uri" class="form-control" id="input-new-url-uri" required placeholder="Enter URI">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-new-url-description">Description</label>
+                            <textarea name='description' id="input-new-url-description" class="form-control" rows="3" placeholder="Enter Description for this url ..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" form="form-new-url" id="btn-new-url-submit">Create</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    <!-- content -->
+    <th:block th:if="${pageContent} != null">
+        <div th:replace="${pageContent}"></div>
+    </th:block>
+    <!-- /.content -->
+
+    <footer class='main-footer'>
+        <div class='float-left d-none d-sm-block'>
+            <img class='img-circle text-center' src="" height='30' width='30' th:src="@{/static/image/devkirin.png}" alt='DevKirin'>
+            <strong>DevKirin's DevTool</strong>
+        </div>
+        <a class='float-right' target="_blank" href='https://github.com/devkirin666'>github</a>
+    </footer>
+</div>
+<!-- ./wrapper -->
+</body>
+
+<select th:fragment="http-status-options" th:remove="tag">
+    <th:block th:each="status : ${T(org.springframework.http.HttpStatus).values()}">
+        <option th:value='${status.value()}' th:text="${status.value() + ' - ' + status.getReasonPhrase()}"></option>
+    </th:block>
+</select>

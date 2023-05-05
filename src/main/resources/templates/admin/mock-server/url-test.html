@@ -1,0 +1,260 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="url-test-modal">
+    <div class='modal' id='modal-url-test' aria-modal='true' role='dialog'>
+        <div class='modal-dialog modal-lg'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title' data-group='url-test' data-name='name' data-target='text'></h4>
+                    <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                        <span aria-hidden='true'>×</span>
+                    </button>
+                </div>
+                <div class='modal-body'>
+                    <input type='hidden' id='input-url-test-id' name="id" data-group='url-test' data-name='id' data-target='value'>
+                    <form id='form-url-test' data-id-field='#input-url-test-id'>
+                        <div class='card-body'>
+                            <div class='form-group row'>
+                                <label for='input-url-test-uri' class='col-sm-2 col-form-label'>URI</label>
+                                <input id='input-url-test-uri' class='form-control col-sm-10' disabled='disabled' type='text' data-group='url-test' data-name='uri' data-target='value'>
+                                <input type='hidden' name='uri' data-group='url' data-name='uri' data-target='value'>
+                            </div>
+                            <div class='form-group row'>
+                                <label for='select-url-test-method' class='col-sm-2 col-form-label'>Method</label>
+                                <select id='select-url-test-method' name='method' class='custom-select col-sm-10' data-clear-target="value" data-clear-content="POST">
+                                    <option value='POST'>POST</option>
+                                    <option value='PUT'>PUT</option>
+                                    <option value='GET'>GET</option>
+                                    <option value='PATCH'>PATCH</option>
+                                    <option value='DELETE'>DELETE</option>
+                                    <option value='HEAD'>HEAD</option>
+                                    <option value='OPTIONS'>OPTIONS</option>
+                                    <option value='TRACE'>TRACE</option>
+                                </select>
+                            </div>
+<!--                            <div class='form-group row'>-->
+<!--                                <div class='form-check'>-->
+<!--                                    <input type='checkbox' name='saveHistory' class='form-check-input float-right' checked='checked' id='check-url-test-history'>-->
+<!--                                    <label class='form-check-label' for='check-url-test-history'>Save History</label>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                        </div>
+                        <!-- path variables -->
+                        <div class='card card-light' id='div-url-test-path-variables'>
+                            <div class='card-header cursor-pointer' data-card-widget='collapse' title='Collapse'>
+                                <h3 class='card-title'>Path Variables</h3>
+                                <div class='card-tools'>
+                                    <button type='button' class='btn btn-tool' data-card-widget='collapse' title='Collapse'><i class='fas fa-sort-down'></i></button>
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class='card-body p-0'>
+                                <table class='table table-sm'>
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Value</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id='tbl-url-test-path-variables' data-clear-target="html" data-clear-content="">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </form>
+                    <!-- request params -->
+                    <div class='card card-light'>
+                        <div class='card-header cursor-pointer' data-card-widget='collapse' title='Collapse'>
+                            <h3 class='card-title'>Parameters</h3>
+                            <div class='card-tools'>
+                                <button type='button' class='btn btn-outline-primary btn-sm' id='btn-url-test-add-params'>Add</button>
+                                <button type='button' class='btn btn-tool' data-card-widget='collapse' title='Collapse'><i class='fas fa-sort-down'></i></button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class='card-body p-0'>
+                            <table class='table table-sm'>
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                    <th class='text-sm-center p-0 m-0' style='width: 10px;'></th>
+                                </tr>
+                                </thead>
+                                <tbody id='tbl-url-test-params' data-clear-target="html" data-clear-content="">
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- request headers -->
+                    <div class='card card-light'>
+                        <div class='card-header cursor-pointer' data-card-widget='collapse' title='Collapse'>
+                            <h3 class='card-title'>Headers</h3>
+                            <div class='card-tools'>
+                                <button type='button' class='btn btn-outline-primary btn-sm' id='btn-url-test-add-headers'>Add</button>
+                                <button type='button' class='btn btn-tool' data-card-widget='collapse' title='Collapse'><i class='fas fa-sort-down'></i></button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class='card-body p-0'>
+                            <table class='table table-sm'>
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                    <th class='text-sm-center p-0 m-0' style='width: 10px;'></th>
+                                </tr>
+                                </thead>
+                                <tbody id='tbl-url-test-headers' data-clear-target="html" data-clear-content="">
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- request body -->
+                    <div class='card card-light'>
+                        <div class='card-header'>
+                            <div class="card-title d-flex align-items-center">
+                                <span>Body</span>
+<!--                                <div class="ml-3">-->
+<!--                                    <button type="button" id="btn-url-test-body-code-lang-dropdown" class="btn btn-sm btn-outline-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false" data-clear-target="text" data-clear-content="JSON">-->
+<!--                                        JSON-->
+<!--                                    </button>-->
+<!--                                    <div class="dropdown-menu">-->
+<!--                                        <button type="button" data-toggle="editor-lang" class="dropdown-item" data-toggle-button="btn-url-test-body-code-lang-dropdown" data-editor-lang="json" data-editor-id="div-url-test-body-code-editor">JSON</button>-->
+<!--                                        <button type="button" data-toggle="editor-lang" class="dropdown-item" data-toggle-button="btn-url-test-body-code-lang-dropdown" data-editor-lang="xml" data-editor-id="div-url-test-body-code-editor">XML</button>-->
+<!--                                        <button type="button" data-toggle="editor-lang" class="dropdown-item" data-toggle-button="btn-url-test-body-code-lang-dropdown" data-editor-lang="html" data-editor-id="div-url-test-body-code-editor">HTML</button>-->
+<!--                                        <button type="button" data-toggle="editor-lang" class="dropdown-item" data-toggle-button="btn-url-test-body-code-lang-dropdown" data-editor-lang="plain_text" data-editor-id="div-url-test-body-code-editor">PLAIN Text</button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+                            </div>
+                            <div class='card-tools ml-auto'>
+                                <button type='button' class='btn btn-tool' data-card-widget='collapse' title='Collapse'><i class='fas fa-sort-down'></i></button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class='card-body p-0'>
+                            <label class='hidden' for='textarea-url-test-body'></label>
+                            <textarea class='hidden' name='body' id='textarea-url-test-body' data-clear-target="value" data-clear-content=""></textarea>
+                            <div data-code-editor="ace" id="div-url-test-body-code-editor" data-editor-value-for='textarea-url-test-body' data-editor-lang='json' data-editor-theme='chrome'></div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+                <div class='modal-footer justify-content-between'>
+                    <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>
+                    <button type='submit' class='btn btn-info' form='form-url-test'>Run</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <div class='modal' id='modal-url-test-result' aria-modal='true' role='dialog'>
+        <div class='modal-dialog modal-lg'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>
+                        <button class="btn btn-secondary" id="btn-url-test-back"><i class="fas fa-chevron-left"></i></button>
+                        <span class='btn btn-inf' data-color-group='result' data-current-color='btn-info' data-group='url-test-result' data-name='result' data-target='text'>OK</span>
+                        <span class="pl-2 text-bold" data-group='url-test-result' data-name='name' data-target='text'></span>
+                        <span>Result</span>
+                    </h4>
+                    <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                        <span aria-hidden='true'>×</span>
+                    </button>
+                </div>
+                <div class='modal-body'>
+                    <div class='card-body'>
+                        <div class='form-group row'>
+                            <label for='input-url-test-result-id' class='col-sm-2 col-form-label'>ID</label>
+                            <input id='input-url-test-result-id' class='form-control col-sm-10' disabled='disabled' type='text' data-group='url-test-result' data-name='id' data-target='value'>
+                        </div>
+                        <div class='form-group row'>
+                            <label for='input-url-test-result-uri' class='col-sm-2 col-form-label'>URI</label>
+                            <input id='input-url-test-result-uri' class='form-control col-sm-10' disabled='disabled' type='text' data-group='url-test-result' data-name='uri' data-target='value'>
+                        </div>
+                    </div>
+                    <div class='card-body'>
+                        <div class='form-group row'>
+                            <label for='span-url-test-result-status' class='col-sm-2 col-form-label'>Status</label>
+                            <span id='span-url-test-result-status' class='btn btn-info w-auto form-control-plaintext' data-color-group='status' data-current-color='btn-info' data-group='url-test-result' data-name='status' data-target='text'>200</span>
+                        </div>
+                    </div>
+                    <!-- request headers -->
+                    <div class='card card-light'>
+                        <div class='card-header cursor-pointer' data-card-widget='collapse' title='Collapse'>
+                            <h3 class='card-title'>Headers</h3>
+                            <div class='card-tools'>
+                                <button type='button' class='btn btn-tool' data-card-widget='collapse' title='Collapse'><i class='fas fa-sort-down'></i></button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class='card-body p-0'>
+                            <table class='table table-sm'>
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                    <th class='text-sm-center p-0 m-0' style='width: 10px;'></th>
+                                </tr>
+                                </thead>
+                                <tbody id='tbl-url-test-result-headers' data-clear-target="html" data-clear-content="">
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- request body -->
+                    <div class='card card-light'>
+                        <div class='card-header'>
+                            <div class="card-title d-flex align-items-center">
+                                <span>Body</span>
+                            </div>
+                            <div class='card-tools'>
+                                <button type='button' class='btn btn-tool' data-card-widget='collapse' title='Collapse'><i class='fas fa-sort-down'></i></button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class='card-body p-0'>
+                            <div data-form-toggle='view' class='form-group' data-language='json' data-group='url-test-result' data-name='body' data-target='code'></div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <div class='card card-light'>
+                        <div class='card-header cursor-pointer' data-card-widget='collapse' title='Collapse'>
+                            <h3 class='card-title'>Matched Responses</h3>
+                            <div class='card-tools'>
+                                <button type='button' class='btn btn-tool' data-card-widget='collapse' title='Collapse'><i class='fas fa-sort-down'></i></button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class='card-body p-0'>
+                            <table class='table table-sm'>
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>ID</th>
+                                    <th>Condition</th>
+                                    <th>Description</th>
+                                </tr>
+                                </thead>
+                                <tbody id='tbl-url-test-result-responses' data-clear-target="html" data-clear-content="">
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+                <div class='modal-footer justify-content-between'>
+                    <button type='button' class='btn btn-default ml-auto' data-dismiss='modal'>Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+<script th:src="@{/static/js/admin/mock-server/url-test.js}"></script>
+</th:block>

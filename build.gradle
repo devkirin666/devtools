@@ -1,0 +1,201 @@
+import org.springframework.util.StringUtils
+
+import java.nio.charset.StandardCharsets
+import java.util.zip.ZipFile
+
+plugins {
+    id 'java'
+    id 'idea'
+    id 'org.springframework.boot' version '2.7.8'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "co.uzzu.dotenv.gradle" version "2.0.0"
+    id 'com.google.cloud.tools.jib' version '3.3.1'
+    id 'maven-publish'
+}
+
+group = 'dev.kirin.toy'
+version = '1.0.0-SNAPSHOT'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+Map<String, String> ENV_MAP = env.allVariables
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+
+    implementation.extendsFrom implementationWithResource
+}
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url ENV_MAP.getOrDefault("PRIVATE_REPO_URL", "")
+        allowInsecureProtocol = true
+        credentials {
+            username = ENV_MAP.getOrDefault("PRIVATE_REPO_CRED_USR", "NO_USER")
+            password = ENV_MAP.getOrDefault("PRIVATE_REPO_CRED_PSW", "NO_PASS")
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    implementation 'org.springframework.session:spring-session-core'
+
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+
+    annotationProcessor 'org.hibernate:hibernate-jpamodelgen'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.h2database:h2'
+    implementation 'com.mysql:mysql-connector-j'
+    implementation 'org.postgresql:postgresql'
+
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
+    implementation 'org.springdoc:springdoc-openapi-security:1.6.14'
+
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+
+    implementation 'dev.kirin.common:core:1.0.0-SNAPSHOT'
+    implementationWithResource 'dev.kirin.common:common-spring:1.0.0-SNAPSHOT'
+//    implementation files('/Users/soulkst/workspace/development/commons/common-spring/build/libs/common-spring-1.0.0-SNAPSHOT.jar')
+
+    implementation 'com.jayway.jsonpath:json-path:2.8.0'
+    implementation 'dev.kirin.common:template:1.0.1-SNAPSHOT'
+
+    // for test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+    testCompileOnly 'org.projectlombok:lombok:1.18.22'
+
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.11.0'
+
+    testImplementation 'dev.kirin.common:junit:1.0.0-SNAPSHOT'
+}
+
+boolean isRelease = true
+String releaseVersion = ENV_MAP.get("RELEASE_VERSION")
+if(!StringUtils.hasText(releaseVersion) || "null" == releaseVersion) {
+    isRelease = false
+    releaseVersion = getVersion().toString()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            allowInsecureProtocol = true
+            url = ENV_MAP.getOrDefault("NEXUS_URL", "NEXUS_URL")
+            credentials {
+                username = ENV_MAP.getOrDefault("NEXUS_USERNAME", "NEXUS_USERNAME")
+                password = ENV_MAP.getOrDefault("NEXUS_PASSWORD", "NEXUS_PASSWORD") // the variable resides in $GRADLE_USER_HOME/gradle.properties
+            }
+            version = releaseVersion
+        }
+    }
+}
+
+jib {
+    allowInsecureRegistries = true
+    from {
+        image = "openjdk:8-jre-alpine"
+        auth {
+            username = ENV_MAP.getOrDefault("DOCKER_HUB_USERNAME", "")
+            password = ENV_MAP.getOrDefault("DOCKER_HUB_PASSWORD", "")
+        }
+    }
+
+    String dockerUser = ENV_MAP.getOrDefault("DOCKER_REGISTRY_USER", "")
+    String DOCKER_REGISTRY_URL = ENV_MAP.getOrDefault("DOCKER_REGISTRY_URL", "")
+
+    if(DOCKER_REGISTRY_URL == null || DOCKER_REGISTRY_URL == "") {
+        DOCKER_REGISTRY_URL = "$dockerUser/"
+    }
+
+    to {
+        image = DOCKER_REGISTRY_URL + getName()
+        tags = ["latest", releaseVersion]
+        auth {
+            username = ENV_MAP.getOrDefault("DOCKER_REGISTRY_USER", "")
+            password = ENV_MAP.getOrDefault("DOCKER_REGISTRY_PASSWORD", "")
+        }
+    }
+    container {
+        mainClass = "dev.kirin.toy.devtools.DevToolsApplication"
+        ports = ["8080", "8081"]
+        creationTime = "USE_CURRENT_TIMESTAMP"
+        environment = [
+                CONTEXT_PATH: "/",
+                DATABASE_URL: "jdbc:h2:mem:devtool",
+                DATABASE_USERNAME: "sa",
+                DATABASE_PASSWORD: "",
+                DATABASE_PLATFORM: "H2Dialect",
+                DATASOURCE_MAX_POOL_SIZE: "10",
+                LOGGING_ROOT_LEVEL: "warn",
+                LOGGING_APP_LEVEL: "info",
+                ENABLE_API_DOCS: "false",
+                ENCRYPT_KEY_FILE: "classpath:default.key",
+                ADMIN_USER: "admin",
+                ADMIN_PASSWORD: "admin"
+        ]
+    }
+}
+
+processResources() {
+    doFirst {
+        def targetPath = "$buildDir/resources/main"
+        configurations.implementationWithResource.files
+                .stream()
+                .map(file -> {
+                    def zip = new ZipFile(file);
+                    return zip.entries().collect()
+                            .stream()
+                            .filter(entry -> {
+                                return !entry.isDirectory()
+                                        && !entry.getName().contains("META-INF")
+                                        && entry.getName().lastIndexOf(".class") < 0
+                            })
+                            .peek(entry -> println entry.getName())
+                            .map(entry -> new Tuple2<>(entry.getName(), zip.getInputStream(entry).getText(StandardCharsets.UTF_8.name())))
+                            .collect()
+                })
+                .flatMap(Collection::stream)
+                .forEach(tuple -> {
+                    def resourceFile = new File(targetPath, tuple.v1);
+                    println resourceFile.getAbsolutePath()
+                    resourceFile.getParentFile().mkdirs();
+                    resourceFile.createNewFile()
+                    resourceFile.text = tuple.v2
+                });
+    }
+}

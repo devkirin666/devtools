@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>Mock-server view i18n message</comment>
+    <!-- Base Errors -->
+    <entry key="view.mock-server.errors.NOT_FOUND.description">Not defined(or matched) URL or Response.</entry>
+    <entry key="view.mock-server.errors.MULTIPLE_URL.description">Matched url was more than one.</entry>
+    <entry key="view.mock-server.errors.NO_RESPONSE.description">No matched any response</entry>
+    <entry key="view.mock-server.errors.UNKNOWN.description">Unknown Error</entry>
+</properties>

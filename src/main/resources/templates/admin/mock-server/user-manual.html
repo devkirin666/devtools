@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" th:xmllang="${#locale.language}">
+<head th:replace="~{admin/mock-server/common :: head(~{this::meta}, ~{this::link}, ~{this::script})}">
+    <title></title>
+
+    <link type="text/css" rel="stylesheet" th:href="@{/static/plugins/highlight-js/styles/atom-one-light.min.css}"/>
+
+    <!-- highlight js-->
+    <script th:src="@{/static/plugins/highlight-js/highlight.min.js}"></script>
+    <script th:src="@{/static/plugins/highlight-js/languages/json.min.js}"></script>
+    <script th:src="@{/static/plugins/highlight-js/languages/javascript.min.js}"></script>
+
+    <!-- ace editor -->
+    <script th:src="@{/static/plugins/markdown-it/markdown-it.min.js}"></script>
+
+    <script th:src="@{/static/js/admin/mock-server/user-manual.js}"></script>
+</head>
+
+<body th:replace="~{admin/mock-server/common :: body(~{this::div})}">
+<!-- Content Wrapper. Contains page content -->
+<div class='content-wrapper'>
+    <section class='content'>
+        <div class='container-fluid' th:data-manual="@{/static/manual/mock-server.md}">
+        </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+</body>
+</html>

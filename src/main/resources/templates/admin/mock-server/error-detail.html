@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" th:xmllang="${#locale.language}">
+<head th:replace="~{admin/mock-server/common :: head(~{this::meta}, ~{this::link}, ~{this::script})}">
+    <meta name="error-type" th:content="${errorType}">
+    <title></title>
+
+    <link type="text/css" rel="stylesheet" th:href="@{/static/plugins/highlight-js/styles/atom-one-light.min.css}"/>
+
+    <!-- highlight js-->
+    <script th:src="@{/static/plugins/highlight-js/highlight.min.js}"></script>
+    <script th:src="@{/static/plugins/highlight-js/languages/json.min.js}"></script>
+    <script th:src="@{/static/plugins/highlight-js/languages/javascript.min.js}"></script>
+
+    <!-- ace editor -->
+    <script th:src="@{/static/plugins/ace-editor/ace.min.js}"></script>
+    <script th:src="@{/static/plugins/ace-editor/ext-beautify.js}"></script>
+
+    <script th:src="@{/static/js/common/jquery-ace-editor.js}"></script>
+
+    <script th:src="@{/static/js/admin/mock-server/error-detail.js}"></script>
+</head>
+
+<body th:replace="~{admin/mock-server/common :: body(~{this::div})}">
+<!-- Content Wrapper. Contains page content -->
+<div class='content-wrapper' th:data-id="${errorType.name()}">
+    <!-- Content Header (Page header) -->
+    <section class='content-header'>
+        <div class='container-fluid'>
+            <div class='row mb-2'>
+                <div class='col-sm-6'>
+                    <h1 th:text="${errorType.getTitle()}"></h1>
+                </div>
+                <div class='col-sm-6'>
+                    <ol class='breadcrumb float-sm-right'>
+                        <li class='breadcrumb-item text-info' th:text="${#messages.msgOrNull('view.mock-server.errors.' + errorType.name() + '.description')}"></li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <form id="form-error-detail">
+        <section class='content'>
+            <div class='container-fluid'>
+                <div class='row'>
+                    <div class='col-12'>
+                        <!-- Main content -->
+                        <div class='invoice p-3 mb-3 min-vh-100'>
+                            <div class="row justify-content-end right text-right">
+                                <div class="col-1 btn-group">
+                                    <button type='button' data-form-toggle='view' class='btn btn-secondary btn-sm' id='btn-error-edit'><i class='fas fa-edit'></i></button>
+                                    <button type='button' data-form-toggle='edit' class='btn btn-default btn-sm' id='btn-error-edit-cancel' style="display: none;"><i class='fas fa-times'></i></button>
+                                    <button type='submit' form="form-error-detail" data-form-toggle='edit' class='btn btn-success btn-sm' id='btn-error-edit-save' style="display: none;"><i class='fas fa-check'></i></button>
+                                </div>
+                            </div>
+                            <div class="card card-light mt-2">
+                                <div class="card-header">
+                                    <h3 class="card-title">Response Status</h3>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div class='form-group row'>
+                                        <label for='input-error-status' class='col-md-4 col-sm-6 col-form-label'>Response Status</label>
+                                        <div data-form-toggle='view' class='col flex-column'>
+                                            <span class='btn w-auto form-control-plaintext' data-color-group='status' data-group='error' data-name='status' data-target='text'></span>
+                                        </div>
+                                        <div data-form-toggle='edit' class='col' style='display: none;'>
+                                            <select id='input-error-status' name='status' class='custom-select' data-group='error' data-name='status' data-target='value' th:insert="admin/mock-server/common::http-status-options"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <div class="card card-light mt-2">
+                                <div class="card-header">
+                                    <h3 class="card-title">Response Headers</h3>
+                                    <div class='card-tools'>
+                                        <button type='button' data-form-toggle="edit" style="display: none;" class='btn btn-outline-primary btn-sm' id='btn-error-add-headers'>Add</button>
+                                    </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <table class='table table-sm table-bordered text-wrap text-break'>
+                                        <thead>
+                                        <tr>
+                                            <th class='w-25'>Name</th>
+                                            <th colspan='2'>Values</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id='tbl-error-headers'>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <div class="card card-light mt-2">
+                                <div class="card-header">
+                                    <div class="card-title d-flex align-items-center">
+                                        <span>Response Body</span>
+<!--                                        <div class="ml-3" data-form-toggle='edit' style="display: none;">-->
+<!--                                            <button type="button" id="btn-error-body-code-lang-dropdown" class="btn btn-sm btn-outline-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false" data-clear-target="text" data-clear-content="JSON">-->
+<!--                                                JSON-->
+<!--                                            </button>-->
+<!--                                            <div class="dropdown-menu">-->
+<!--                                                <button type="button" data-toggle="editor-lang" class="dropdown-item" data-toggle-button="btn-error-body-code-lang-dropdown" data-editor-lang="json" data-editor-id="div-error-body-code-editor">JSON</button>-->
+<!--                                                <button type="button" data-toggle="editor-lang" class="dropdown-item" data-toggle-button="btn-error-body-code-lang-dropdown" data-editor-lang="xml" data-editor-id="div-error-body-code-editor">XML</button>-->
+<!--                                                <button type="button" data-toggle="editor-lang" class="dropdown-item" data-toggle-button="btn-error-body-code-lang-dropdown" data-editor-lang="html" data-editor-id="div-error-body-code-editor">HTML</button>-->
+<!--                                                <button type="button" data-toggle="editor-lang" class="dropdown-item" data-toggle-button="btn-error-body-code-lang-dropdown" data-editor-lang="plain_text" data-editor-id="div-error-body-code-editor">PLAIN Text</button>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+                                    </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div data-form-toggle='view' class='form-group' data-language='json' data-group='error' data-name='body' data-target='code'></div>
+                                    <div data-form-toggle='edit' class='form-group row flex-fill h-100' style='display: none;'>
+                                        <div class='col d-flex flex-column'>
+                                            <label class='hidden' for='input-error-response-body'></label>
+                                            <textarea class='hidden' name='body' id='input-error-response-body'></textarea>
+                                            <div id="div-error-body-code-editor" data-code-editor="ace" data-group='error' data-name='body' data-target='editor' data-editor-value-for='input-error-response-body' data-editor-lang='json' data-editor-theme='chrome'></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                        </div>
+                        <!-- /.invoice -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </form>
+</div>
+<!-- /.content-wrapper -->
+</body>
+</html>

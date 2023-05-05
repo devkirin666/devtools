@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>Mock-server view i18n message</comment>
+    <!-- Base Errors -->
+    <entry key="view.mock-server.errors.NOT_FOUND.description">정의된 URL이 없거나 정의된 응답 데이터가 없음</entry>
+    <entry key="view.mock-server.errors.MULTIPLE_URL.description">URL 매칭 결과가 하나 이상임</entry>
+    <entry key="view.mock-server.errors.NO_RESPONSE.description">응답할 결과가 없음</entry>
+    <entry key="view.mock-server.errors.UNKNOWN.description">알 수 없는 오류 발생</entry>
+</properties>
